@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Status</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+        header {
+            background: #333;
+            color: #fff;
+            padding: 1em 0;
+            text-align: center;
+        }
+        .form-group {
+            margin: 1em 0;
+        }
+        label {
+            display: block;
+            margin-bottom: .5em;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="date"] {
+            width: 100%;
+            padding: .5em;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            display: inline-block;
+            padding: .5em 1em;
+            font-size: 1em;
+            color: #fff;
+            background-color: #333;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #555;
+        }
+        .results {
+            margin: 2em 0;
+            padding: 1em;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .results h2 {
+            margin-top: 0;
+        }
+        .results pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Flight Status Application</h1>
+    </header>
+    <div class="container">
+        <div class="form-group">
+            <label for="flightMethod">Search by:</label>
+            <select id="flightMethod">
+                <option value="route">Route</option>
+                <option value="id">Flight ID</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="fromAirport">From Airport (3-letter code):</label>
+            <input type="text" id="fromAirport" placeholder="e.g., LHR">
+        </div>
+        <div class="form-group">
+            <label for="toAirport">To Airport (3-letter code):</label>
+            <input type="text" id="toAirport" placeholder="e.g., DOH">
+        </div>
+        <div class="form-group">
+            <label for="flightID">Flight ID:</label>
+            <input type="text" id="flightID" placeholder="e.g., QR 940">
+        </div>
+        <div class="form-group">
+            <label for="depDate">Departure Date:</label>
+            <input type="date" id="depDate">
+        </div>
+        <button onclick="fetchFlightStatus()">Get Flight Status</button>
+        <div class="results" id="results"></div>
+    </div>
+
+    <script>
+        function fetchFlightStatus() {
+            const method = document.getElementById('flightMethod').value;
+            const fromAirport = document.getElementById('fromAirport').value.toUpperCase();
+            const toAirport = document.getElementById('toAirport').value.toUpperCase();
+            const flightID = document.getElementById('flightID').value.toUpperCase();
+            const depDate = document.getElementById('depDate').value;
+
+            let url = 'https://api.flightstats.com/flex/flightstatus/rest/v2/json/';
+
+            if (method === 'route') {
+                if (!fromAirport || !toAirport || !depDate) {
+                    alert('Please enter all required fields.');
+                    return;
+                }
+                url += `route/status/${fromAirport}/${toAirport}/dep/${depDate}?appId=c0108d04&appKey=a05ff275a408df68c013da1bc00d4046&hourOfDay=0&numHours=24&utc=false`;
+            } else if (method === 'id') {
+                if (!flightID || !depDate) {
+                    alert('Please enter all required fields.');
+                    return;
+                }
+                const [airlineCode, flightNumber] = flightID.split(' ');
+                url += `flight/status/${airlineCode}/${flightNumber}/dep/${depDate}?appId=c0108d04&appKey=a05ff275a408df68c013da1bc00d4046&utc=false`;
+            }
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    const results = document.getElementById('results');
+                    results.innerHTML = `<h2>Flight Status:</h2><pre>${JSON.stringify(data, null, 2)}</pre>`;
+                })
+                .catch(error => {
+                    console.error('Error fetching flight status:', error);
+                });
+        }
+    </script>
+</body>
+</html>

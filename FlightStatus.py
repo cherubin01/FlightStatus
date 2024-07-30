@@ -6,381 +6,277 @@ import os
 
 # Flight Status
 
-	# Flight Status by ID and API URL 
-		# Example
-		# flight_stat_url = "https://api.flightstats.com/flex/flightstatus/rest/v2/json/flight/status/QR/1/arr/2018/08/21?appId=***&appKey=***&utc=false"
-	# Flight Status by Route and API URL
-		# Example
-		# flight_stat_url = "https://api.flightstats.com/flex/flightstatus/rest/v2/json/route/status/DOH/LHR/dep/2018/08/21?appId=***&appKey=***&hourOfDay=0&utc=false&numHours=24"
-	# Flight Status by ID and Web Scrapping 
-		# Example
-		# flight_stat_url = "https://www.flightstats.com/v2/flight-tracker/AA/18?year=2018&month=8&date=21"
-
 def api_url_generator(host, appID, apiKey):
-	print("How would you like to search for your flight?")
-	method = input("By Route or Flight_ID? {route, id}: ")
-	url = host
-	os.system('clear')
+    print("How would you like to search for your flight?")
+    method = input("By Route or Flight_ID? {route, id}: ")
+    url = host
+    os.system('clear')
 
-	if method in ["route", "r", "R", "Route", "ROUTE"]:
-		url += "route/status/"
+    if method.lower() in ["route", "r"]:
+        url += "route/status/"
 
-		# Adding the Departure and Arrival Airports
-		print("Please Enter the 3 Character Code for the Airports (Ex. LHR - London Heathrow, DOH - Doha Hamad Int'l)")
-		from_air = input("From: ")
-		# ** ** Need to make a validate function
-		# validate_airport_code(from_air)
-		to_air = input("To: ")
-		# ** ** Need to make a validate function
-		# validate_airport_code(from_air)
-		url += from_air +  '/' + to_air + '/dep/'
-		
-		os.system('clear')
+        # Adding the Departure and Arrival Airports
+        print("Please Enter the 3 Character Code for the Airports (Ex. LHR - London Heathrow, DOH - Doha Hamad Int'l)")
+        from_air = input("From: ").upper()
+        to_air = input("To: ").upper()
+        url += f"{from_air}/{to_air}/dep/"
+        
+        os.system('clear')
 
-		# Adding the Departure Date on which we search for flights
-		print ("From: ", from_air, " --> ", "To: ", to_air)
-		print ()
-		print ('Please enter you departure date')
-		dep_year = input('Year (YYYY): ')
-		dep_month = input('Month (MM): ')
-		dep_day = input('Day (DD): ')
-		if (dep_year == '') or (dep_month == '') or (dep_day == ''):
-			dep_year = str(datetime.datetime.now().year)
-			dep_month = str(datetime.datetime.now().month)
-			dep_day = str(datetime.datetime.now().day)
-		url += dep_year + '/' + dep_month + '/' + dep_day
+        # Adding the Departure Date on which we search for flights
+        print ("From: ", from_air, " --> ", "To: ", to_air)
+        print()
+        print('Please enter your departure date')
+        dep_year = input('Year (YYYY): ')
+        dep_month = input('Month (MM): ')
+        dep_day = input('Day (DD): ')
+        if (dep_year == '') or (dep_month == '') or (dep_day == ''):
+            dep_year = str(datetime.datetime.now().year)
+            dep_month = str(datetime.datetime.now().month).zfill(2)
+            dep_day = str(datetime.datetime.now().day).zfill(2)
+        url += f"{dep_year}/{dep_month}/{dep_day}"
 
-		# Adding the Api Key and the remaining fields
-		url += '?appId=' + appID + '&appKey=' + apiKey + '&hourOfDay=' + '0' + '&numHours=' + '24' + '&utc=false'
-		return url
+        # Adding the Api Key and the remaining fields
+        url += f'?appId={appID}&appKey={apiKey}&hourOfDay=0&numHours=24&utc=false'
+        return url
 
-	elif method in ["id", "Id", "ID", "Flight_ID", "flight_id", "Flight ID", "flight id", "flight_ID", "flight ID"]:
-		url += "flight/status/"
+    elif method.lower() in ["id", "flight_id"]:
+        url += "flight/status/"
 
-		# Adding the flight code
-		air_code = input('Please Enter the Airline Code (Ex. QR -> Qatar Airways, BA -> British Airways): ')
-		# ** ** Need to make a validate function
-		flight_no = input('Please Enter the Flight no.: ')
-		url += air_code + '/' + flight_no + '/dep/'
-		print ()
-		print ('Please enter you departure date')
-		dep_year = input('Year (YYYY): ')
-		dep_month = input('Month (MM): ')
-		dep_day = input('Day (DD): ')
-		if (dep_year == '') or (dep_month == '') or (dep_day == ''):
-			dep_year = str(datetime.datetime.now().year)
-			dep_month = str(datetime.datetime.now().month)
-			dep_day = str(datetime.datetime.now().day)
-		url += dep_year + '/' + dep_month + '/' + dep_day
+        # Adding the flight code
+        air_code = input('Please Enter the Airline Code (Ex. QR -> Qatar Airways, BA -> British Airways): ').upper()
+        flight_no = input('Please Enter the Flight no.: ')
+        url += f"{air_code}/{flight_no}/dep/"
+        print()
+        print('Please enter your departure date')
+        dep_year = input('Year (YYYY): ')
+        dep_month = input('Month (MM): ')
+        dep_day = input('Day (DD): ')
+        if (dep_year == '') or (dep_month == '') or (dep_day == ''):
+            dep_year = str(datetime.datetime.now().year)
+            dep_month = str(datetime.datetime.now().month).zfill(2)
+            dep_day = str(datetime.datetime.now().day).zfill(2)
+        url += f"{dep_year}/{dep_month}/{dep_day}"
 
-		# Adding the Api Key and the remaining fields
-		url += '?appId=' + appID + '&appKey=' + apiKey + '&utc=false'
-		return url
+        # Adding the Api Key and the remaining fields
+        url += f'?appId={appID}&appKey={apiKey}&utc=false'
+        return url
 
-	else:
-		try_again = input("Sorry Wrong Input! Do you want to retry? (y/n): ")
-		if try_again in ['y', 'Y', 'Yes', 'yes', 'YES']:
-			os.system('clear')
-			api_url_generator(host, appID, apiKey)
-		else:
-			return ""
-
-
+    else:
+        try_again = input("Sorry Wrong Input! Do you want to retry? (y/n): ")
+        if try_again.lower() in ['y', 'yes']:
+            os.system('clear')
+            return api_url_generator(host, appID, apiKey)
+        else:
+            return ""
 
 def airlines(data, code):
-	if data['appendix']['airlines']:
-		for airline in data['appendix']['airlines']:
-			if airline['fs'] == code:
-				return airline['name']
-		return "Error: Airlines Not Found"
-	else:
-		return "Error: No Airlines Available"
-
-
+    if data.get('appendix', {}).get('airlines'):
+        for airline in data['appendix']['airlines']:
+            if airline['fs'] == code:
+                return airline['name']
+    return "Error: Airlines Not Found"
 
 def airport(data, code):
-	if data['appendix']['airports']:
-		for airport in data['appendix']['airports']:
-			if airport['fs'] == code:
-				return airport['name'] + " - " + airport['city']
-		return "Error: No such Airport Not Found"
-	else:
-		return "Error: No Airports Available"
-
-
+    if data.get('appendix', {}).get('airports'):
+        for airport in data['appendix']['airports']:
+            if airport['fs'] == code:
+                return f"{airport['name']} - {airport['city']}"
+    return "Error: No Airports Available"
 
 def strtots(string):
-	y = int(string[:4])
-	m = int(string[5:7])
-	d = int(string[8:10])
-	h = int(string[11:13])
-	mi = int(string[14:16])
-	dt = datetime.datetime(y, m, d, h, mi)
-	return time.mktime(dt.timetuple())
-
-
+    y = int(string[:4])
+    m = int(string[5:7])
+    d = int(string[8:10])
+    h = int(string[11:13])
+    mi = int(string[14:16])
+    dt = datetime.datetime(y, m, d, h, mi)
+    return time.mktime(dt.timetuple())
 
 def timediff(arr, dep):
-	departure = strtots(dep)
-	arrival = strtots(arr)
-
-	duration = arrival - departure
-	return time.strftime("%H:%M", time.gmtime(duration))
-
-
+    departure = strtots(dep)
+    arrival = strtots(arr)
+    duration = arrival - departure
+    return time.strftime("%H:%M", time.gmtime(duration))
 
 def departed(data):
-	print()
-	# 	* Actual Departure Time
-	try:
-		ADT = data['operationalTimes']['actualGateDeparture']['dateLocal']
-	except KeyError:
-		ADT = data['operationalTimes']['scheduledGateDeparture']['dateLocal']                                                                                                                                                                                                                                                                                                                                                                                                             
-	ADTime = ADT.split('T')
-	ADTime = ADTime[1].split(':')
-	ADTime = ADTime[0] + ':' + ADTime[1]                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
-	print('\tActual Departure Time: ', '\t', ADTime)
+    print()
+    # Actual Departure Time
+    ADT = data.get('operationalTimes', {}).get('actualGateDeparture', {}).get('dateLocal', 
+        data.get('operationalTimes', {}).get('scheduledGateDeparture', {}).get('dateLocal', 'N/A'))
+    ADTime = ADT.split('T')[1].split(':')
+    ADTime = f"{ADTime[0]}:{ADTime[1]}"
+    print(f'\tActual Departure Time: \t{ADTime}')
 
-	# 	* Time left on journey
-	current_time = str(datetime.datetime.utcnow().isoformat())
-	try:
-		UtcSAT = data['operationalTimes']['estimatedGateArrival']['dateUtc']
-	except KeyError:
-		UtcSAT = data['operationalTimes']['scheduledGateArrival']['dateUtc']
+    # Time left on journey
+    current_time = str(datetime.datetime.utcnow().isoformat())
+    UtcSAT = data.get('operationalTimes', {}).get('estimatedGateArrival', {}).get('dateUtc',
+        data.get('operationalTimes', {}).get('scheduledGateArrival', {}).get('dateUtc', 'N/A'))
+    rem_time = timediff(UtcSAT, current_time)
+    rem_time = rem_time.split(':')
+    rem_time = f"{rem_time[0]}hrs {rem_time[1]}min"
+    print(f'\tArriving at Destination in: \t{rem_time}')
 
-	rem_time = timediff(UtcSAT, current_time)
-	rem_time = rem_time.split(':')
-	rem_time = rem_time[0] + 'hrs ' + rem_time[1] + 'min'
-	print('\tArriving at Destination in: ', '\t', rem_time)
-
-	# 	* Scheduled Arrival Time
-	SAT = data['operationalTimes']['scheduledGateArrival']['dateLocal']
-	SATime = SAT.split('T')
-	SATime = SATime[1].split(':')
-	SATime = SATime[0] + ':' + SATime[1]
-	print('\tScheduled Arrival Time: ', '\t', SATime)
-
-
+    # Scheduled Arrival Time
+    SAT = data.get('operationalTimes', {}).get('scheduledGateArrival', {}).get('dateLocal', 'N/A')
+    SATime = SAT.split('T')[1].split(':')
+    SATime = f"{SATime[0]}:{SATime[1]}"
+    print(f'\tScheduled Arrival Time: \t{SATime}')
 
 def arrived(data):
-	print()
-	# 	* Actual Departure Time
-	try:
-		ADT = data['operationalTimes']['actualGateDeparture']['dateLocal']
-	except KeyError:
-		ADT = data['operationalTimes']['scheduledGateDeparture']['dateLocal']                                                                                                                                                                                                                                                                                                                                                                                                             
-	ADTime = ADT.split('T')
-	ADTime = ADTime[1].split(':')
-	ADTime = ADTime[0] + ':' + ADTime[1]                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
-	print('\tActual Departure Time: ', '\t', ADTime)
+    print()
+    # Actual Departure Time
+    ADT = data.get('operationalTimes', {}).get('actualGateDeparture', {}).get('dateLocal', 
+        data.get('operationalTimes', {}).get('scheduledGateDeparture', {}).get('dateLocal', 'N/A'))
+    ADTime = ADT.split('T')[1].split(':')
+    ADTime = f"{ADTime[0]}:{ADTime[1]}"
+    print(f'\tActual Departure Time: \t{ADTime}')
 
-	# 	* Actual Arrival Time
-	try:
-		AAT = data['operationalTimes']['actualGateArrival']['dateLocal']
-	except KeyError:
-		AAT = data['operationalTimes']['scheduledGateArrival']['dateLocal']
-	AATime = AAT.split('T')
-	AATime = AATime[1].split(':')
-	AATime = AATime[0] + ':' + AATime[1]
-	print('\tActual Arrival Time: ', '\t', AATime)
+    # Actual Arrival Time
+    AAT = data.get('operationalTimes', {}).get('actualGateArrival', {}).get('dateLocal', 
+        data.get('operationalTimes', {}).get('scheduledGateArrival', {}).get('dateLocal', 'N/A'))
+    AATime = AAT.split('T')[1].split(':')
+    AATime = f"{AATime[0]}:{AATime[1]}"
+    print(f'\tActual Arrival Time: \t{AATime}')
 
-	# 	* Journey Time
-	try:
-		AAT = data['operationalTimes']['actualGateArrival']['dateUtc']
-	except KeyError:
-		AAT = data['operationalTimes']['scheduledGateArrival']['dateUtc']
-	try:
-		ADT = data['operationalTimes']['actualGateDeparture']['dateUtc']
-	except KeyError:
-		ADT = data['operationalTimes']['scheduledGateDeparture']['dateUtc']
-	jour_time = timediff(AAT, ADT)        
-	jour_time = jour_time.split(':')
-	jour_time = jour_time[0] + 'hrs ' + jour_time[1] + 'min'                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
-	print('\tDuration of Journey: ', '\t', jour_time)
+    # Journey Time
+    AAT = data.get('operationalTimes', {}).get('actualGateArrival', {}).get('dateUtc', 
+        data.get('operationalTimes', {}).get('scheduledGateArrival', {}).get('dateUtc', 'N/A'))
+    ADT = data.get('operationalTimes', {}).get('actualGateDeparture', {}).get('dateUtc', 
+        data.get('operationalTimes', {}).get('scheduledGateDeparture', {}).get('dateUtc', 'N/A'))
+    jour_time = timediff(AAT, ADT)        
+    jour_time = jour_time.split(':')
+    jour_time = f"{jour_time[0]}hrs {jour_time[1]}min"                                                                                                                                                                                                                                            
+    print(f'\tDuration of Journey: \t{jour_time}')
 
-	#	* Time Since Flight Landed
-	current_time = str(datetime.datetime.utcnow().isoformat())
-	past_time = timediff(current_time, AAT)
-	past_time = past_time.split(':')
-	past_time = past_time[0] + 'hrs ' + past_time[1] + 'min'
-	print('\tTime Since Flight Landed: ', '\t', past_time)
-
-
+    # Time Since Flight Landed
+    current_time = str(datetime.datetime.utcnow().isoformat())
+    past_time = timediff(current_time, AAT)
+    past_time = past_time.split(':')
+    past_time = f"{past_time[0]}hrs {past_time[1]}min"
+    print(f'\tTime Since Flight Landed: \t{past_time}')
 
 def scheduled(data):
-	print()
-	# 	* Scheduled Departure Time
-	SDT = data['operationalTimes']['scheduledGateDeparture']['dateLocal']
-	SDTime = SDT.split('T')
-	SDTime = SDTime[1].split(':')
-	SDTime = SDTime[0] + ':' + SDTime[1]
-	print('\tScheduled Departure Time: ', '\t', SDTime)
+    print()
+    # Scheduled Departure Time
+    SDT = data.get('operationalTimes', {}).get('scheduledGateDeparture', {}).get('dateLocal', 'N/A')
+    SDTime = SDT.split('T')[1].split(':')
+    SDTime = f"{SDTime[0]}:{SDTime[1]}"
+    print(f'\tScheduled Departure Time: \t{SDTime}')
 
-	# 	* Scheduled Arrival Time
-	SAT = data['operationalTimes']['scheduledGateArrival']['dateLocal']
-	SATime = SAT.split('T')
-	SATime = SATime[1].split(':')
-	SATime = SATime[0] + ':' + SATime[1]
-	print('\tScheduled Arrival Time: ', '\t', SATime)
+    # Scheduled Arrival Time
+    SAT = data.get('operationalTimes', {}).get('scheduledGateArrival', {}).get('dateLocal', 'N/A')
+    SATime = SAT.split('T')[1].split(':')
+    SATime = f"{SATime[0]}:{SATime[1]}"
+    print(f'\tScheduled Arrival Time: \t{SATime}')
 
-	# 	* Estimated Journey Begin Time
-	current_time = str(datetime.datetime.utcnow().isoformat())
-	rem_time = timediff(data['operationalTimes']['scheduledGateDeparture']['dateUtc'], current_time)
-	rem_time = rem_time.split(':')
-	rem_time = rem_time[0] + 'hrs ' + rem_time[1] + 'min'
-	print('\tFlight Departs in: ', '\t', rem_time)
-
-
+    # Estimated Journey Begin Time
+    current_time = str(datetime.datetime.utcnow().isoformat())
+    rem_time = timediff(data.get('operationalTimes', {}).get('scheduledGateDeparture', {}).get('dateUtc', 'N/A'), current_time)
+    rem_time = rem_time.split(':')
+    rem_time = f"{rem_time[0]}hrs {rem_time[1]}min"
+    print(f'\tFlight Departs in: \t{rem_time}')
 
 def output(data):
-	statuses = {"A":"Departed", "C":"Canceled", 'D':'Diverted',\
-				'DN':'Data source needed', 'L':'Landed', \
-				'NO':'Not Operational', 'R':'Redirected', \
-				'S':'Scheduled', 'U':'Unknown'}
+    statuses = {"A":"Departed", "C":"Canceled", 'D':'Diverted', 'DN':'Data source needed', 'L':'Landed', 'NO':'Not Operational', 'R':'Redirected', 'S':'Scheduled', 'U':'Unknown'}
 
-	if data['flightStatuses']:
-		print ("Found ", len(data['flightStatuses'])," flight/s for the information provided.")
-		print ("The Flights Data is presented below: ")
-		print("******************************************************************************")
-		for flight in data['flightStatuses']:
-			print("\tFlight No.: ", '\t', flight["carrierFsCode"], flight["flightNumber"])
-			print("\tAirlines: ", '\t', airlines(data, flight["carrierFsCode"]))
-			print()
-			print("\tFrom: ", '\t', flight["departureAirportFsCode"], '\t', airport(data, flight["departureAirportFsCode"]))
-			print("\tTo: ", '\t', flight["arrivalAirportFsCode"], '\t', airport(data, flight["arrivalAirportFsCode"]))
-			print()
-			print("\tStatus: ", statuses[flight["status"]])
-			if statuses[flight["status"]] == 'Departed':
-				#Run the Departed Code
-				departed(flight)
-			elif statuses[flight["status"]] == 'Landed':
-				#Run the Arrived Code
-				arrived(flight)
-			elif statuses[flight["status"]] == 'Scheduled':
-				#Run the Scheduled Code
-				scheduled(flight)
-			print("******************************************************************************")
-
-	else:
-		print ("Sorry! No Flights found matching your description. Please check all fields and try again :)")
-
-
+    if data.get('flightStatuses'):
+        print(f"Found {len(data['flightStatuses'])} flight/s for the information provided.")
+        print("The Flights Data is presented below: ")
+        print("******************************************************************************")
+        for flight in data['flightStatuses']:
+            print(f"\tFlight No.: \t{flight['carrierFsCode']} {flight['flightNumber']}")
+            print(f"\tAirlines: \t{airlines(data, flight['carrierFsCode'])}")
+            print()
+            print(f"\tFrom: \t{flight['departureAirportFsCode']} \t{airport(data, flight['departureAirportFsCode'])}")
+            print(f"\tTo: \t{flight['arrivalAirportFsCode']} \t{airport(data, flight['arrivalAirportFsCode'])}")
+            print()
+            print(f"\tStatus: \t{statuses.get(flight['status'], 'Unknown')}")
+            if statuses.get(flight['status']) == 'Departed':
+                departed(flight)
+            elif statuses.get(flight['status']) == 'Landed':
+                arrived(flight)
+            elif statuses.get(flight['status']) == 'Scheduled':
+                scheduled(flight)
+            print("******************************************************************************")
+    else:
+        print("Sorry! No Flights found matching your description. Please check all fields and try again :)")
 
 def airport_data_salvager(data):
-	airports_path = 'Data/airports.json'
-	airports = data['appendix']['airports']
-	counter = 0
-	new_airports = []
-	for airport in airports:
-		del_fields = ['iata', 'icao', 'localTime', 'classification', 'active', 'delayIndexUrl', 'weatherUrl']
-		for field in del_fields:
-			try:
-				airport.pop(field)
-			except KeyError:
-				pass
-		airport_name = airport['fs'] + ' - ' + airport['name'] + ' - ' + airport['city']
-		airport['airport'] = airport_name
+    airports_path = 'Data/airports.json'
+    airports = data.get('appendix', {}).get('airports', [])
+    counter = 0
+    new_airports = []
+    for airport in airports:
+        del_fields = ['iata', 'icao', 'localTime', 'classification', 'active', 'delayIndexUrl', 'weatherUrl']
+        for field in del_fields:
+            airport.pop(field, None)
+        airport_name = f"{airport['fs']} - {airport['name']} - {airport['city']}"
+        airport['airport'] = airport_name
 
-		if os.path.exists(airports_path):
-			airports_data = json.load(open(airports_path, 'r'))
-			if airport not in airports_data:
-				airports_data.append(airport)
-				counter += 1
-				new_airports.append(airport['fs'] + ' - ' + airport['city'])
-			with open(airports_path, "w") as ports_json:
-				json.dump(airports_data, ports_json)
-			
-			
-		else:
-			airports_data = []
-			if airport not in airports_data:
-				airports_data.append(airport)
-				counter += 1
-				new_airports.append(airport['fs'] + ' - ' + airport['city'])
-			with open(airports_path, "w") as ports_json:
-				json.dump(airports_data, ports_json)
-			
+        if os.path.exists(airports_path):
+            airports_data = json.load(open(airports_path, 'r'))
+            if airport not in airports_data:
+                airports_data.append(airport)
+                counter += 1
+                new_airports.append(f"{airport['fs']} - {airport['city']}")
+            with open(airports_path, "w") as ports_json:
+                json.dump(airports_data, ports_json)
+        else:
+            airports_data = [airport]
+            counter += 1
+            new_airports.append(f"{airport['fs']} - {airport['city']}")
+            with open(airports_path, "w") as ports_json:
+                json.dump(airports_data, ports_json)
 
-	if counter > 1:
-		print (counter, " New airports have been saved to the local storage. They are: ")
-		print ()
-	elif counter == 1:
-		print (counter, " New airport has been saved to the local storage. It is: ")
-		print ()
-	else:
-		print ("No New Airports have been located.")
+    if counter > 1:
+        print(f"{counter} New airports have been saved to the local storage. They are: ")
+    elif counter == 1:
+        print(f"{counter} New airport has been saved to the local storage. It is: ")
+    else:
+        print("No New Airports have been located.")
 
-	if new_airports:
-		for i in new_airports:
-			print(i)
-
-
+    if new_airports:
+        for i in new_airports:
+            print(i)
 
 def airlines_data_salvager(data):
-	airlines_path = 'Data/airlines.json'
-	try:
-		airlines = data['appendix']['airlines']
-	except KeyError:
-		pass
+    airlines_path = 'Data/airlines.json'
+    airlines = data.get('appendix', {}).get('airlines', [])
+    counter = 0
+    new_airlines = []
+    for flight in airlines:
+        del_fields = ['iata', 'icao', 'phoneNumber', 'active']
+        for field in del_fields:
+            flight.pop(field, None)
+        flight_name = f"{flight['fs']} - {flight['name']}"
+        flight['airline'] = flight_name
 
-	else:
-		counter = 0
-		new_airlines = []
-		for flight in airlines:
-			del_fields = ['iata', 'icao', 'phoneNumber', 'active']
-			for field in del_fields:
-				try:
-					flight.pop(field)
-				except KeyError:
-					pass
-			flight_name = flight['fs'] + ' - ' + flight['name']
-			flight['airline'] = flight_name
+        if os.path.exists(airlines_path):
+            airlines_data = json.load(open(airlines_path, 'r'))
+            if flight not in airlines_data:
+                airlines_data.append(flight)
+                counter += 1
+                new_airlines.append(flight['airline'])
+            with open(airlines_path, "w") as flights_json:
+                json.dump(airlines_data, flights_json)
+        else:
+            airlines_data = [flight]
+            counter += 1
+            new_airlines.append(flight['airline'])
+            with open(airlines_path, "w") as flights_json:
+                json.dump(airlines_data, flights_json)
 
-			if os.path.exists(airlines_path):
-				airlines_data = json.load(open(airlines_path, 'r'))
-				if flight not in airlines_data:
-					airlines_data.append(flight)
-					counter += 1
-					new_airlines.append(flight['airline'])
-				with open(airlines_path, "w") as flights_json:
-					json.dump(airlines_data, flights_json)
-				
-				
-			else:
-				airlines_data = []
-				if flight not in airlines_data:
-					airlines_data.append(flight)
-					counter += 1
-					new_airlines.append(flight['airline'])
-				with open(airlines_path, "w") as flights_json:
-					json.dump(airlines_data, flights_json)
-				
+    if counter > 1:
+        print(f"{counter} New airlines have been saved to the local storage. They are: ")
+    elif counter == 1:
+        print(f"{counter} New airline has been saved to the local storage. It is: ")
+    else:
+        print("No New Airlines have been located.")
 
-		if counter > 1:
-			print (counter, " New airlines have been saved to the local storage. They are: ")
-			print ()
-		elif counter == 1:
-			print (counter, " New airline has been saved to the local storage. It is: ")
-			print ()
-		else:
-			print ("No New Airlines have been located.")
-
-		if new_airlines:
-			for i in new_airlines:
-				print(i)
-	# # TO READ FROM AIRPORTS FILE
- #    data = json.load(open(path, 'r'))
-
-	# # TO WRITE TO AIRPORTS FILE
-	# with open(airports_path, "w") as ports_json:
- #                    json.dump(data, ports_json)
-
-
-
-
-
-
-
+    if new_airlines:
+        for i in new_airlines:
+            print(i)
 
 os.system('clear')
 # Creating the API URL 
@@ -392,80 +288,24 @@ flight_stat_url = api_url_generator(host, appID, apiKey)
 os.system('clear')
 
 if flight_stat_url:
-	data = requests.get(flight_stat_url).text
-	print(data)
-	data = json.loads(data)
+    response = requests.get(flight_stat_url)
+    data = response.json()
+    output(data)
+    # Uncomment if you want to save new airport and airline data
+    # airport_data_salvager(data)
+    # airlines_data_salvager(data)
 
-output(data)
-#airlines_data_salvager(data)
+# Print additional information
+try:
+    airports_data = json.load(open('Data/airports.json', 'r'))
+    print(f"Total No. of airports collected: {len(airports_data)}")
+except FileNotFoundError:
+    print("No airport data file found.")
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# print ("Demographics")	
-airports_data = json.load(open('Data/airlines.json', 'r'))
-# countries = []
-# count = 0
-# for i in airports_data:
-# 	if i['countryName'] not in countries:
-# 		countries.append(i['countryName'])
-# 	if i['regionName'] == 'Africa':
-# 		count += 1
-print("Total No. of airports collected: ", len(airports_data))
-# print("Total No. of unique countries in airports collected: ", len(countries))
-# print("Total Airports collected in Africa: ", count)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Airport Status
-airport_url = "https://api.flightstats.com/flex/flightstatus/rest/v2/json/airport/status/ABQ/arr/2018/08/17/22?appId=***&appKey=***&utc=false&numHours=1"
-	#Airport Status Web Scrapping
-	#"https://www.flightstats.com/v2/airport-conditions/YKF"
-
+# Example Airport Status URL
+# airport_url = "https://api.flightstats.com/flex/flightstatus/rest/v2/json/airport/status/ABQ/arr/2018/08/17/22?appId=***&appKey=***&utc=false&numHours=1"
+# Airport Status Web Scrapping
+# "https://www.flightstats.com/v2/airport-conditions/YKF"
 
 
 
